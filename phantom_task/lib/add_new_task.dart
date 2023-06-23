@@ -1,50 +1,207 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:phantom_task/controller.dart';
 
 class NewTask extends StatelessWidget {
-  const NewTask({super.key});
+  NewTask({super.key});
+  Todocontroller todocontroller = Get.put(Todocontroller());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blueAccent,
-        leading: Padding(
-          padding: const EdgeInsets.all(9),
-          child: ClipOval(
-            child: Container(
-              child: Material(
-                color: Colors.amber, // Button color
-                child: InkWell(
-                  splashColor: Colors.black, // Splash color
-                  onTap: () {
-                    Get.back();
-
-                    print("hi");
-                  },
-                  child: const SizedBox(
-                      width: 45,
-                      height: 45,
-                      child: Icon(
-                        Icons.arrow_back_ios,
-                        size: 20,
-                        color: Colors.white,
-                      )),
+        backgroundColor: Colors.blueGrey[50],
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                height: 70,
+                child: SingleChildScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  child: Stack(
+                    children: [
+                      Image.asset("assets/images/new.jpg",
+                          fit: BoxFit.fitWidth,
+                          width: MediaQuery.of(context).size.width),
+                      GestureDetector(
+                        onTap: () => Get.back(),
+                        child: const CircleAvatar(
+                            backgroundColor: Colors.white,
+                            radius: 15,
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Icon(Icons.close),
+                            )),
+                      ),
+                      // Align(
+                      //   alignment: Alignment.centerLeft,
+                      //   child: ElevatedButton(
+                      //       onPressed: () {
+                      //         Get.back();
+                      //       },
+                      //       style: ElevatedButton.styleFrom(
+                      //           shape: const CircleBorder(),
+                      //           backgroundColor: Colors.white,
+                      //           fixedSize: const Size(10, 40)),
+                      //       child: const Center(child: Icon(Icons.close))),
+                      // ),
+                      const Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Add New Task",
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Task title"),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        hintText: 'Task Title',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                          borderSide: const BorderSide(),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        fillColor: Colors.white,
+                        filled: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 5.0),
+                      ),
+                    ),
+                    const Text("Add Image"),
+                    TextFormField(
+                        onTap: () => null,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          hintText: 'Add Image',
+                          suffixIcon: const Icon(
+                            Icons.camera,
+                            color: Colors.grey,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                            borderSide: const BorderSide(),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                          fillColor: Colors.white,
+                          filled: true,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 5.0),
+                        )),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text("Date"),
+                              const SizedBox(height: 10),
+                              TextFormField(
+                                decoration: InputDecoration(
+                                  hintText: 'Date',
+                                  suffixIcon: const Icon(
+                                    Icons.calendar_month_outlined,
+                                    color: Colors.grey,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                    borderSide: const BorderSide(),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                    borderSide:
+                                        const BorderSide(color: Colors.grey),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                    borderSide:
+                                        const BorderSide(color: Colors.grey),
+                                  ),
+                                  fillColor: Colors.white,
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0, vertical: 5.0),
+                                ),
+                                onTap: () => todocontroller.selectDate,
+                              )
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text("Time"),
+                              const SizedBox(height: 10),
+                              TextFormField(
+                                decoration: InputDecoration(
+                                  hintText: 'Time',
+                                  suffixIcon: const Icon(
+                                    Icons.timer_outlined,
+                                    color: Colors.grey,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                    borderSide: const BorderSide(),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                    borderSide:
+                                        const BorderSide(color: Colors.grey),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                    borderSide:
+                                        const BorderSide(color: Colors.grey),
+                                  ),
+                                  fillColor: Colors.white,
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0, vertical: 5.0),
+                                ),
+                                onTap: () => todocontroller.selectDate,
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                    const Text("Notes"),
+                    const TextField(
+                      minLines: 3,
+                      maxLines: 3,
+                    )
+                  ],
+                ),
+              )
+            ],
           ),
-        ),
-        title: const Text(
-          "Add New Task",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        toolbarHeight: 80,
-      ),
-      body: Container(
-        height: 100,
-        color: Colors.amber,
-      ),
-    );
+        ));
   }
 }

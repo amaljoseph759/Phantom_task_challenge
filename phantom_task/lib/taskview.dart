@@ -17,7 +17,7 @@ class TaskView extends StatelessWidget {
                 Container(
                   // height: MediaQuery.of(context).size.height / 2.9,
                   child: Image.asset(
-                    "assets/images/img2.png",
+                    "assets/images/new.jpg",
                     fit: BoxFit.fitWidth,
                   ),
                 ),
@@ -63,8 +63,8 @@ class TaskView extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.orange),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
                         child: Align(
                             alignment: Alignment.centerLeft,
                             child: Text("Compleated")),
@@ -90,7 +90,7 @@ class TaskView extends StatelessWidget {
         width: double.infinity,
         child: ElevatedButton(
           onPressed: () {
-            Get.to(const NewTask());
+            Get.to(NewTask());
           },
           child: const Text('Button Texxt'),
         ),
