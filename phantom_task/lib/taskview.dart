@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-// import 'package:intl/intl.dart';
 import 'package:get/get.dart';
-import 'package:phantom_task/add_new_task.dart';
+import 'package:phantom_task/controller.dart';
+// import 'package:intl/intl.dart';
+
+import 'add_new_task.dart';
 
 class TaskView extends StatelessWidget {
-  const TaskView({super.key});
+  TaskView({super.key});
+  Todocontroller todocontroller = Get.put(Todocontroller());
 
   @override
   Widget build(BuildContext context) {
@@ -28,16 +31,15 @@ class TaskView extends StatelessWidget {
                     children: [
                       Stack(
                         children: [
-                          Align(
-                            alignment: Alignment.topLeft,
-                            child: ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                    shape: const CircleBorder(),
-                                    backgroundColor: Colors.white,
-                                    fixedSize: const Size(10, 40)),
-                                child: const Center(
-                                    child: Icon(Icons.arrow_back_ios))),
+                          GestureDetector(
+                            onTap: () => Get.back(),
+                            child: const CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: 15,
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: Icon(Icons.arrow_back_ios),
+                                )),
                           ),
                           const Align(
                             alignment: Alignment.center,
@@ -55,14 +57,41 @@ class TaskView extends StatelessWidget {
                             fontSize: 30, fontWeight: FontWeight.bold),
                       ),
                       Container(
-                        margin:
-                            const EdgeInsets.only(left: 10, right: 10, top: 50),
-                        height: MediaQuery.of(context).size.height / 3,
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
+                          margin: const EdgeInsets.only(
+                              left: 10, right: 10, top: 50),
+                          height: MediaQuery.of(context).size.height / 2.8,
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
-                            color: Colors.orange),
-                      ),
+                          ),
+                          child: GetBuilder<Todocontroller>(
+                            builder: (controller) => ListView.separated(
+                                itemBuilder: (context, index) {
+                                  return Obx(() => CheckboxListTile(
+                                        title: Text(todocontroller
+                                            .pendingTodo[index].title),
+                                        subtitle: Text(todocontroller
+                                            .pendingTodo[index].date
+                                            .toString()),
+                                        tileColor: Colors.white,
+                                        value: todocontroller
+                                            .pendingTodo[index].completed,
+                                        onChanged: (value) {
+                                          todocontroller.pendingTodo[index]
+                                              .completed = value!;
+
+                                          todocontroller.updateStatus(
+                                              value, index);
+
+                                          print(value);
+                                        },
+                                      ));
+                                },
+                                separatorBuilder: (context, index) =>
+                                    const Divider(),
+                                itemCount: todocontroller.pendingTodo.length),
+                          )),
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 10),
                         child: Align(
@@ -70,14 +99,40 @@ class TaskView extends StatelessWidget {
                             child: Text("Compleated")),
                       ),
                       Container(
-                        margin:
-                            const EdgeInsets.only(left: 10, right: 10, top: 0),
-                        height: MediaQuery.of(context).size.height / 3,
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.orange),
-                      ),
+                          margin: const EdgeInsets.only(
+                              left: 10, right: 10, top: 0),
+                          height: MediaQuery.of(context).size.height / 3,
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.orange),
+                          child: GetBuilder<Todocontroller>(
+                            builder: (controller) => ListView.separated(
+                                itemBuilder: (context, index) {
+                                  return Obx(() => CheckboxListTile(
+                                        title: Text(todocontroller
+                                            .completedTodo[index].title),
+                                        subtitle: Text(todocontroller
+                                            .completedTodo[index].date
+                                            .toString()),
+                                        tileColor: Colors.white,
+                                        value: todocontroller
+                                            .completedTodo[index].completed,
+                                        onChanged: (value) {
+                                          todocontroller.completedTodo[index]
+                                              .completed = value!;
+
+                                          todocontroller.updateStatus(
+                                              value, index);
+
+                                          print(value);
+                                        },
+                                      ));
+                                },
+                                separatorBuilder: (context, index) =>
+                                    const Divider(),
+                                itemCount: todocontroller.completedTodo.length),
+                          )),
                     ],
                   ),
                 ),
