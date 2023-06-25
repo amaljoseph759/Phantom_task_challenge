@@ -1,14 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:phantom_task/controller.dart';
 import 'package:phantom_task/taskview.dart';
 
-class NewTask extends StatelessWidget {
-  NewTask({super.key});
+class NewTask extends StatefulWidget {
+  NewTask({super.key, required this.isNewTask, this.todo, this.index});
+
+  bool isNewTask;
+  PendingTodo? todo;
+  int? index;
+
+  @override
+  State<NewTask> createState() => _NewTaskState();
+}
+
+class _NewTaskState extends State<NewTask> {
   Todocontroller todocontroller = Get.put(Todocontroller());
+
+  TextEditingController title = TextEditingController();
+
+  TextEditingController date = TextEditingController();
+
+  TextEditingController time = TextEditingController();
+
+  TextEditingController note = TextEditingController();
+
+  TextEditingController image = TextEditingController();
+
+  DateTime? selDate;
+  TimeOfDay? selTime;
+  XFile? selImage;
+
+  dynamic argument = Get.arguments;
+
+  @override
+  void initState() {
+    if (!widget.isNewTask && widget.todo != null) {
+      title.text = widget.todo!.title!;
+      note.text = widget.todo!.notes!;
+
+      date.text =
+          '${widget.todo!.date.day}/${widget.todo!.date.month}/${widget.todo!.date.year}';
+      image.text = widget.todo!.image!;
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (!widget.isNewTask) {
+      time.text = widget.todo!.time!.format(context);
+    }
+
     return Scaffold(
       backgroundColor: Colors.blueGrey[50],
       body: SingleChildScrollView(
@@ -26,32 +70,28 @@ class NewTask extends StatelessWidget {
                         width: MediaQuery.of(context).size.width),
                     GestureDetector(
                       onTap: () => Get.back(),
-                      child: const CircleAvatar(
-                          backgroundColor: Colors.white,
-                          radius: 15,
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Icon(Icons.close),
-                          )),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: CircleAvatar(
+                            backgroundColor: Colors.white,
+                            radius: 15,
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Icon(Icons.close),
+                            )),
+                      ),
                     ),
-                    // Align(
-                    //   alignment: Alignment.centerLeft,
-                    //   child: ElevatedButton(
-                    //       onPressed: () {
-                    //         Get.back();
-                    //       },
-                    //       style: ElevatedButton.styleFrom(
-                    //           shape: const CircleBorder(),
-                    //           backgroundColor: Colors.white,
-                    //           fixedSize: const Size(10, 40)),
-                    //       child: const Center(child: Icon(Icons.close))),
-                    // ),
                     const Align(
                       alignment: Alignment.center,
-                      child: Text(
-                        "Add New Task",
-                        style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.bold),
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 10.0),
+                        child: Text(
+                          "Add New Task",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ],
@@ -63,11 +103,12 @@ class NewTask extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Task title"),
+                  const Text("Title"),
                   const SizedBox(
                     height: 10,
                   ),
                   TextFormField(
+                    controller: title,
                     decoration: InputDecoration(
                       hintText: 'Task Title',
                       border: OutlineInputBorder(
@@ -96,13 +137,22 @@ class NewTask extends StatelessWidget {
                     height: 10,
                   ),
                   TextFormField(
-                      onTap: () => null,
+                      controller: image,
                       readOnly: true,
                       decoration: InputDecoration(
                         hintText: 'Add Image',
-                        suffixIcon: const Icon(
-                          Icons.camera,
-                          color: Colors.grey,
+                        suffixIcon: InkWell(
+                          onTap: () async {
+                            XFile? selectedImage = await todocontroller
+                                .showUploadSelectionTab(context);
+                            selImage = selectedImage;
+                            print(selectedImage);
+                            image.text = selectedImage!.path.toString();
+                          },
+                          child: const Icon(
+                            Icons.camera,
+                            color: Colors.grey,
+                          ),
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
@@ -134,11 +184,21 @@ class NewTask extends StatelessWidget {
                             const Text("Date"),
                             const SizedBox(height: 10),
                             TextFormField(
+                              controller: date,
                               decoration: InputDecoration(
                                 hintText: 'Date',
-                                suffixIcon: const Icon(
-                                  Icons.calendar_month_outlined,
-                                  color: Colors.grey,
+                                suffixIcon: InkWell(
+                                  onTap: () async {
+                                    var selectDate = await todocontroller
+                                        .selectDate(context);
+                                    selDate = selectDate;
+                                    date.text =
+                                        '${selectDate.day}/${selectDate.month}/${selectDate.year}';
+                                  },
+                                  child: const Icon(
+                                    Icons.calendar_month_outlined,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(5.0),
@@ -159,7 +219,7 @@ class NewTask extends StatelessWidget {
                                 contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 16.0, vertical: 5.0),
                               ),
-                              onTap: () => todocontroller.selectDate,
+                              // onTap: () => todocontroller.selectDate,
                             )
                           ],
                         ),
@@ -172,11 +232,22 @@ class NewTask extends StatelessWidget {
                             const Text("Time"),
                             const SizedBox(height: 10),
                             TextFormField(
+                              controller: time,
                               decoration: InputDecoration(
                                 hintText: 'Time',
-                                suffixIcon: const Icon(
-                                  Icons.timer_outlined,
-                                  color: Colors.grey,
+                                suffixIcon: InkWell(
+                                  onTap: () async {
+                                    TimeOfDay selectedTime =
+                                        await todocontroller
+                                            .selectTime(context);
+                                    selTime = selectedTime;
+                                    time.text =
+                                        ' ${selectedTime.format(context)}';
+                                  },
+                                  child: const Icon(
+                                    Icons.timer_outlined,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(5.0),
@@ -197,7 +268,6 @@ class NewTask extends StatelessWidget {
                                 contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 16.0, vertical: 5.0),
                               ),
-                              onTap: () => todocontroller.selectDate,
                             ),
                           ],
                         ),
@@ -212,6 +282,7 @@ class NewTask extends StatelessWidget {
                     height: 10,
                   ),
                   TextFormField(
+                    controller: note,
                     decoration: InputDecoration(
                       hintText: 'Notes',
                       suffixIcon: const Icon(
@@ -248,16 +319,33 @@ class NewTask extends StatelessWidget {
       floatingActionButton: Container(
         width: double.infinity,
         child: ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
           onPressed: () {
-            todocontroller.addNewTask(
-              title: "amal",
-              date: DateTime(2022),
-              image: "rfgg",
-              note: "hgffh",
-            );
+            if (!widget.isNewTask) {
+              todocontroller.updateTask(
+                  PendingTodo(
+                      title: title.text,
+                      date: selDate!,
+                      notes: note.text,
+                      image: selImage!.path,
+                      time: selTime,
+                      completed: false),
+                  widget.index!,
+                  context);
+            }
+            todocontroller.addNewTask(PendingTodo(
+                title: title.text,
+                date: selDate!,
+                notes: note.text,
+                image: selImage!.path,
+                time: selTime,
+                completed: false));
             Get.to(() => TaskView());
           },
-          child: const Text('Save'),
+          child: const Text(
+            'Save',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

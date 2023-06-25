@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phantom_task/controller.dart';
@@ -22,6 +24,7 @@ class TaskView extends StatelessWidget {
                   child: Image.asset(
                     "assets/images/new.jpg",
                     fit: BoxFit.fitWidth,
+                    width: double.infinity,
                   ),
                 ),
                 Padding(
@@ -41,12 +44,14 @@ class TaskView extends StatelessWidget {
                                   child: Icon(Icons.arrow_back_ios),
                                 )),
                           ),
-                          const Align(
+                          Align(
                             alignment: Alignment.center,
                             child: Text(
-                              "october 22,2020",
-                              style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.bold),
+                              todocontroller.getCurrentDate().toString(),
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
@@ -54,7 +59,9 @@ class TaskView extends StatelessWidget {
                       const Text(
                         "My Todo List",
                         style: TextStyle(
-                            fontSize: 30, fontWeight: FontWeight.bold),
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold),
                       ),
                       Container(
                           margin: const EdgeInsets.only(
@@ -68,24 +75,33 @@ class TaskView extends StatelessWidget {
                           child: GetBuilder<Todocontroller>(
                             builder: (controller) => ListView.separated(
                                 itemBuilder: (context, index) {
-                                  return Obx(() => CheckboxListTile(
-                                        title: Text(todocontroller
-                                            .pendingTodo[index].title),
-                                        subtitle: Text(todocontroller
-                                            .pendingTodo[index].date
-                                            .toString()),
-                                        tileColor: Colors.white,
-                                        value: todocontroller
-                                            .pendingTodo[index].completed,
-                                        onChanged: (value) {
-                                          todocontroller.pendingTodo[index]
-                                              .completed = value!;
-
-                                          todocontroller.updateStatus(
-                                              value, index);
-
-                                          print(value);
-                                        },
+                                  return Obx(() => InkWell(
+                                        onTap: () => Get.to(
+                                          NewTask(
+                                            isNewTask: false,
+                                            index: index,
+                                            todo: todocontroller
+                                                .pendingTodo[index],
+                                          ),
+                                        ),
+                                        child: ListTile(
+                                            title: Text(todocontroller
+                                                .pendingTodo[index].title!),
+                                            subtitle: Text(todocontroller
+                                                .pendingTodo[index].date
+                                                .toString()),
+                                            tileColor: Colors.white,
+                                            trailing: Checkbox(
+                                              value: todocontroller
+                                                  .pendingTodo[index].completed,
+                                              onChanged: (value) {
+                                                todocontroller
+                                                    .pendingTodo[index]
+                                                    .completed = value!;
+                                                todocontroller.updateStatus(
+                                                    value, index);
+                                              },
+                                            )),
                                       ));
                                 },
                                 separatorBuilder: (context, index) =>
@@ -104,30 +120,29 @@ class TaskView extends StatelessWidget {
                           height: MediaQuery.of(context).size.height / 3,
                           width: MediaQuery.of(context).size.width,
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.orange),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                           child: GetBuilder<Todocontroller>(
                             builder: (controller) => ListView.separated(
                                 itemBuilder: (context, index) {
-                                  return Obx(() => CheckboxListTile(
-                                        title: Text(todocontroller
-                                            .completedTodo[index].title),
-                                        subtitle: Text(todocontroller
-                                            .completedTodo[index].date
-                                            .toString()),
-                                        tileColor: Colors.white,
-                                        value: todocontroller
-                                            .completedTodo[index].completed,
-                                        onChanged: (value) {
-                                          todocontroller.completedTodo[index]
-                                              .completed = value!;
+                                  return CheckboxListTile(
+                                    title: Text(todocontroller
+                                        .completedTodo[index].title),
+                                    subtitle: Text(todocontroller
+                                        .completedTodo[index].date
+                                        .toString()),
+                                    tileColor: Colors.white,
+                                    value: todocontroller
+                                        .completedTodo[index].completed,
+                                    onChanged: (value) {
+                                      todocontroller.completedTodo[index]
+                                          .completed = value!;
 
-                                          todocontroller.updateStatus(
-                                              value, index);
+                                      todocontroller.updateStatus(value, index);
 
-                                          print(value);
-                                        },
-                                      ));
+                                      print(value);
+                                    },
+                                  );
                                 },
                                 separatorBuilder: (context, index) =>
                                     const Divider(),
@@ -144,10 +159,16 @@ class TaskView extends StatelessWidget {
       floatingActionButton: Container(
         width: double.infinity,
         child: ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
           onPressed: () {
-            Get.to(NewTask());
+            Get.to(NewTask(
+              isNewTask: true,
+            ));
           },
-          child: const Text('Button Texxt'),
+          child: const Text(
+            'Add New Task',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
